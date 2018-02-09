@@ -18,5 +18,5 @@ Also time was spent on getting jasper integration download
 it took around  a hour..
 We need to store this in some folder so thigns will be easiler
 
-getting all reports working ...
+getting all reports working ...time 9.11
 
