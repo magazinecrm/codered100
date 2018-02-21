@@ -1,0 +1,109 @@
+create or replace
+PROCEDURE           "INOVICE_ENTRIESR_P1" 
+(mcacid varchar2,MTNO NUMBER,MCATCODE VARCHAR2,msdno number,maccountno varchar2,mmagazine_no number,mprofession varchar2,
+mmanual_pid varchar2,mlocal varchar2,mchequedate date,minvtype varchar2,mmembership_no varchar2,
+mstart_issue subscribers.start_issue%type,mend_issue subscribers.end_issue%type,moffer subscribers.offer%type,minvnarration varchar2,
+minvnarration2 varchar2,mctn_no number,mcontactno contact.contact_no%type,MINVDATE subscribers.inv_date%type,
+minvoiceamount number,minvtrans varchar2,minvbal number,mpaytrans varchar2,mpaytype varchar2,mpay_status varchar2,
+mpaiddate date,mpaidamt number,mno_copies number,munit_amt number,mdisc_amt number,
+mdisc_percent number,mgross_amt number,mcourier varchar2,mcourier_amt number,mregcharge varchar2,mtax_amt number,msubscribeno number,
+mname_on_card varchar2,mcredit_no varchar2,mcrd_exp_date date,mcredit_card varchar2,mcheque_name varchar2,
+msortcode varchar2,mdebit_name varchar2,mdebit_bank varchar2,mbank_branch varchar2,mcompany varchar2,
+mtitle varchar2,mname varchar2,msurname varchar2,maddressedas varchar2,maddress1 varchar2,
+maddress2 varchar2,mcounty varchar2,mcity varchar2,mstate varchar2,mpostcode varchar2,
+mcountry varchar2,mphone varchar2,
+mcellphone varchar2,memail varchar2,
+mcurrency varchar2,mfinv_tot_amt number,minv_famt number,mdisc_famt number,mfunit_amt number,mpaid_famt number,
+moldinvno varchar2,memp_code varchar2, mino             OUT NUMBER,minob OUT NUMBER,
+   minvno           OUT NUMBER,mpidb out number,
+   mpayid           OUT NUMBER) is
+maccount varchar2(20);
+mpay_id number;
+--minvno subscribers.inv_no%type;
+mbal number(10);
+
+
+begin
+
+
+mbal := 0;
+--insert into mtest (name) values ('INVOICEENTRRminDDDvamt'||minvoiceamount||'x'||mpaidamt);
+
+warn(mpaidamt||'starminvamoutn='||minvoiceamount);
+IF minvoiceamount = mpaidamt THEN
+                  --  INSERT INTO mtest (name) values ('enterrinv=paid');
+invoice_ins_subr
+(mtno,mcatcode,msdno,maccountno,mmagazine_no,mctn_no,mcontactno,mprofession,MINVDATE,
+minvoiceamount,mpaiddate,mpaidamt,MNO_COPIES,munit_amt,
+mdisc_amt,mdisc_percent,mgross_amt,mcourier,mcourier_amt,MREGcHARGE,mtax_amt,
+minvtrans,'SUBR','Y',minvbal,mpay_status,
+mpaytype,msubscribeno,mmembership_no,
+mstart_issue,mend_issue,moffer,minvnarration,minvnarration2,mcompany,mtitle,
+mname,msurname,maddressedas,maddress1,maddress2,
+mcounty,mcity,mstate,mpostcode,mcountry,
+mphone,mcellphone,memail,
+mcurrency,mfinv_tot_amt,minv_famt,mdisc_famt,mfunit_amt,
+memp_code,mino,minob,minvno);
+warn('invoicexxx');
+                        -- insert into mtest (name) values ('5555invno'||minvno);
+
+                          --pay_trans_cr_id (maccountno,mmagazine_no,mmanual_pid,mctn_no,mcontactno,mlocal,mchequedate,mpaiddate,mpaytype,'AUTOMATIC',
+                          mpaytrans,mpaidamt,mino,minvno,minvoiceamount,0,mpaid_famt,mcurrency,'Y','SUBR',mname_on_card,mcredit_no,mcrd_exp_date,
+						  mcredit_card,mcheque_name,msortcode,mdebit_name,mdebit_bank,mbank_branch,memp_code,mpayid);
+                   pay_trans_cr_ID (maccountno,mmagazine_no,mmanual_pid, mctn_no, mcontactno,mcompany,maddressedas, mlocal, null, mpaiddate, mpaytype, 
+				   'MPAYMODE', mpaytrans, mpaidamt, mino, minvno, minvoiceamount, 0,
+                       mpaid_famt, mcurrency, 'Y', 'SUB', mname_on_card, mcredit_no, mcrd_exp_date, mcredit_card, 
+					   mcheque_name, msortcode, mdebit_name, mdebit_bank, mbank_branch,memp_code,mpidb,MPAYID); --   mcramt number,minvno number,
+
+		 ACCOUNT_tRANSI_DR(mtno,mmagazine_no,matype,mctn_no,mcontactno,mcompany,maddressedas,MINVDATE,minvtrans,minvoiceamount,0,mino,minvno,mINVTYPE,'Y',maccount,find_accountno(maccount));
+       if asystem_mode() ='ACCURAL' THEN
+MACCOUNT  := 'DEFERRED REVENUE';
+ELSE 
+MACCOUNT  := 'SUBSCRIBERSALES';
+END IF;
+ACCOUNT_tRANSI_CR(mtno,mmagazine_no,matype,mctn_no,mcontactno,mcompany,maddressedas,minvdate,mpaytrans,minvoiceamount,minvoiceamount,mino,minvno,minvtype,'Y',maccount,find_accountno(maccount)););
+end if;
+
+IF nvl(minvoiceamount,0) > nvl(mpaidamt,0)  THEN
+      IF NVL(mpaidamt,0) = 0 THEN
+            --     insert into mtest (name)  values ('xx'||mcontactno);
+            warn('swordstarready');
+                  mbal := minvoiceamount;
+                          invoice_ins_subr
+(mtno,mcatcode,msdno,maccountno,mmagazine_no,
+mctn_no,mcontactno,mprofession,MINVDATE,minvoiceamount, mpaiddate,mpaidamt,MNO_COPIES,munit_amt,mdisc_amt, mdisc_percent,
+mgross_amt,mcourier,mcourier_amt,mregcharge, mtax_amt,minvtrans,'SUBR','N',MBAL, mpay_status, mpaytype,msubscribeno,mmembership_no,mstart_issue,
+mend_issue,moffer,minvnarration,minvnarration2,mcompany,
+mtitle,mname,msurname,maddressedas,maddress1,
+maddress2,mcounty,mcity,mstate,mpostcode,
+mcountry,mphone,mcellphone,memail,mcurrency,
+mfinv_tot_amt,minv_famt,mdisc_famt,mfunit_amt,memp_code,mino,minob,minvno);
+                  MACCOUNT := 'ACCOUNTSRECIVABLE';
+                  ACCOUNT_tRANSI_DR(mtno,mmagazine_no,matype,mctn_no,mcontactno,mcompany,maddressedas,mpaiddate,mpaytrans,minvoiceamount,minvoiceamount,mino,minvno,minvtype,'Y',maccount,find_accountno(maccount));
+                  MACCOUNT := 'SUBSCRIBERSALESR';
+		              ACCOUNT_tRANSI_CR(mtno,mmagazine_no,matype,mctn_no,mcontactno,mcompany,maddressedas,mpaiddate,mpaytrans,minvoiceamount,MBAL,mino,minvno,minvtype,'Y',maccount,find_accountno(maccount));
+                  insert into mtest (name)  values (minvoiceamount||mctn_no||'max'||mcontactno);
+
+                 ct_upd_bal(mcacid,mctn_no,mcurrency,minvoiceamount);
+ELSE IF mpaidamt > 0 THEN
+                  mbal := nvl(minvoiceamount,0) - nvl(mpaidamt,0);
+                             invoice_ins_subr
+(mtno,mcatcode,msdno,maccountno,mmagazine_no,mctn_no,mcontactno,mprofession,MINVDATE,
+minvoiceamount,mpaiddate,mpaidamt,MNO_COPIES,munit_amt,
+mdisc_amt,mdisc_percent,mgross_amt,mcourier,mcourier_amt,mregcharge,mtax_amt,
+minvtrans,'SUBR','Y',minvbal,mpay_status,
+mpaytype,msubscribeno,mmembership_no,
+mstart_issue,mend_issue,moffer,minvnarration,minvnarration2,mcompany,mtitle,
+mname,msurname,maddressedas,maddress1,maddress2,
+mcounty,mcity,mstate,mpostcode,mcountry,
+mphone,mcellphone,memail,
+mcurrency,mfinv_tot_amt,minv_famt,mdisc_famt,mfunit_amt,memp_code,mino,minob,minvno);
+      pay_trans_cr_ID (maccountno, mmagazine_no, mmanual_pid, mctn_no, mcontactno,mcompany,maddressedas, mlocal, 'mcheck_date', mpaiddate, 
+      mpaytype, 'AUTOMATIC', mpaytrans, mpaidamt, mino,
+                       minvno, minvoiceamount, 0, mpaid_famt, mcurrency, 'Y', 'SUB', mname_on_card, mcredit_no, mcrd_exp_date, mcredit_card, 
+					   mcheque_name, msortcode, mdebit_name, mdebit_bank, mbank_branch, memp_code,mpidb, MPAYID); end if;
+end if;
+
+ end if;
+
+end;
