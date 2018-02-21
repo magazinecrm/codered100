@@ -1,6 +1,6 @@
 create or replace
 PROCEDURE           "INOVICE_ENTRIESR_P1" 
-(mcacid varchar2,MTNO NUMBER,MCATCODE VARCHAR2,msdno number,maccountno varchar2,mmagazine_no number,mprofession varchar2,
+(mcacid varchar2,matype varchar2,MTNO NUMBER,MCATCODE VARCHAR2,msdno number,maccountno varchar2,mmagazine_no number,mprofession varchar2,
 mmanual_pid varchar2,mlocal varchar2,mchequedate date,minvtype varchar2,mmembership_no varchar2,
 mstart_issue subscribers.start_issue%type,mend_issue subscribers.end_issue%type,moffer subscribers.offer%type,minvnarration varchar2,
 minvnarration2 varchar2,mctn_no number,mcontactno contact.contact_no%type,MINVDATE subscribers.inv_date%type,
@@ -47,9 +47,6 @@ memp_code,mino,minob,minvno);
 warn('invoicexxx');
                         -- insert into mtest (name) values ('5555invno'||minvno);
 
-                          --pay_trans_cr_id (maccountno,mmagazine_no,mmanual_pid,mctn_no,mcontactno,mlocal,mchequedate,mpaiddate,mpaytype,'AUTOMATIC',
-                          mpaytrans,mpaidamt,mino,minvno,minvoiceamount,0,mpaid_famt,mcurrency,'Y','SUBR',mname_on_card,mcredit_no,mcrd_exp_date,
-						  mcredit_card,mcheque_name,msortcode,mdebit_name,mdebit_bank,mbank_branch,memp_code,mpayid);
                    pay_trans_cr_ID (maccountno,mmagazine_no,mmanual_pid, mctn_no, mcontactno,mcompany,maddressedas, mlocal, null, mpaiddate, mpaytype, 
 				   'MPAYMODE', mpaytrans, mpaidamt, mino, minvno, minvoiceamount, 0,
                        mpaid_famt, mcurrency, 'Y', 'SUB', mname_on_card, mcredit_no, mcrd_exp_date, mcredit_card, 
@@ -61,7 +58,7 @@ MACCOUNT  := 'DEFERRED REVENUE';
 ELSE 
 MACCOUNT  := 'SUBSCRIBERSALES';
 END IF;
-ACCOUNT_tRANSI_CR(mtno,mmagazine_no,matype,mctn_no,mcontactno,mcompany,maddressedas,minvdate,mpaytrans,minvoiceamount,minvoiceamount,mino,minvno,minvtype,'Y',maccount,find_accountno(maccount)););
+ACCOUNT_tRANSI_CR(mtno,mmagazine_no,matype,mctn_no,mcontactno,mcompany,maddressedas,minvdate,mpaytrans,minvoiceamount,minvoiceamount,mino,minvno,minvtype,'Y',maccount,find_accountno(maccount));
 end if;
 
 IF nvl(minvoiceamount,0) > nvl(mpaidamt,0)  THEN
